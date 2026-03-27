@@ -1,0 +1,380 @@
+   1 <!doctype html>
+    2 <html lang="en">
+    3 <head>
+    4 <meta charset="UTF-8" />
+    5 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    6 <title>Shankar's Bookshelf</title>
+    7 <link rel="preconnect" href="https://fonts.googleapis.com" />
+    8 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    9 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=EB+Garamond:wght@400;500&family=Courier+
+      Prime&display=swap" rel="stylesheet" />
+   10 <style>
+   11 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+   12
+   13 body {
+   14   min-height: 100vh;
+   15   background: #386AF5;
+   16   display: flex;
+   17   align-items: center;
+   18   justify-content: center;
+   19   overflow-x: hidden;
+   20   font-family: 'Cormorant Garamond', serif;
+   21 }
+   22
+   23 #sky {
+   24   position: fixed;
+   25   inset: 0;
+   26   pointer-events: none;
+   27   z-index: 0;
+   28 }
+   29
+   30 .scene {
+   31   position: relative;
+   32   z-index: 10;
+   33   display: flex;
+   34   flex-direction: column;
+   35   align-items: center;
+   36   padding: 64px 48px 72px;
+   37 }
+   38
+   39 header {
+   40   text-align: center;
+   41   margin-bottom: 64px;
+   42 }
+   43
+   44 .eyebrow {
+   45   font-family: 'Courier Prime', monospace;
+   46   font-size: 10px;
+   47   letter-spacing: 0.38em;
+   48   text-transform: uppercase;
+   49   color: rgba(255,255,255,0.6);
+   50   margin-bottom: 16px;
+   51 }
+   52
+   53 h1 {
+   54   font-size: clamp(48px, 8vw, 88px);
+   55   font-weight: 300;
+   56   line-height: 1.05;
+   57   letter-spacing: -0.02em;
+   58   color: #fff;
+   59   text-shadow: 0 2px 24px rgba(0,0,40,0.25);
+   60 }
+   61
+   62 h1 em { font-style: italic; color: #FFE58A; }
+   63
+   64 .subtitle {
+   65   font-family: 'Courier Prime', monospace;
+   66   font-size: 11px;
+   67   letter-spacing: 0.18em;
+   68   color: rgba(255,255,255,0.5);
+   69   margin-top: 18px;
+   70 }
+   71
+   72 .shelf-wrap {
+   73   display: flex;
+   74   flex-direction: column;
+   75   align-items: center;
+   76 }
+   77
+   78 .books-row {
+   79   display: flex;
+   80   align-items: flex-end;
+   81   gap: 3px;
+   82   padding: 0 6px;
+   83 }
+   84
+   85 .book {
+   86   position: relative;
+   87   width: 52px;
+   88   height: 340px;
+   89   cursor: pointer;
+   90   transform-origin: bottom center;
+   91   transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.28s ease;
+   92   flex-shrink: 0;
+   93   border-radius: 2px 2px 0 0;
+   94 }
+   95
+   96 .book::before {
+   97   content: '';
+   98   position: absolute;
+   99   top: 0; left: 0; right: 0;
+  100   height: 7px;
+  101   background: rgba(255,255,255,0.28);
+  102   border-radius: 2px 2px 0 0;
+  103   z-index: 3;
+  104   pointer-events: none;
+  105 }
+  106
+  107 .book-body {
+  108   width: 100%;
+  109   height: 100%;
+  110   background: var(--bg);
+  111   border-radius: 2px 2px 0 0;
+  112   display: flex;
+  113   flex-direction: column;
+  114   align-items: center;
+  115   justify-content: space-between;
+  116   padding: 16px 5px 12px;
+  117   position: relative;
+  118   overflow: hidden;
+  119 }
+  120
+  121 .book-stripe {
+  122   position: absolute;
+  123   top: 16px; bottom: 12px;
+  124   left: 50%;
+  125   transform: translateX(-50%);
+  126   width: 1px;
+  127   background: linear-gradient(to bottom, transparent, var(--accent) 40%, var(--accent) 60%, transparent);
+  128   opacity: 0.25;
+  129 }
+  130
+  131 .book-title {
+  132   writing-mode: vertical-rl;
+  133   text-orientation: mixed;
+  134   transform: rotate(180deg);
+  135   font-family: 'EB Garamond', serif;
+  136   font-size: 12px;
+  137   font-weight: 500;
+  138   letter-spacing: 0.07em;
+  139   color: #fff;
+  140   line-height: 1.25;
+  141   text-align: center;
+  142   flex: 1;
+  143   overflow: hidden;
+  144   padding: 4px 0;
+  145 }
+  146
+  147 .book-author {
+  148   writing-mode: vertical-rl;
+  149   text-orientation: mixed;
+  150   transform: rotate(180deg);
+  151   font-family: 'Courier Prime', monospace;
+  152   font-size: 8px;
+  153   letter-spacing: 0.14em;
+  154   text-transform: uppercase;
+  155   color: rgba(255,255,255,0.6);
+  156   white-space: nowrap;
+  157   overflow: hidden;
+  158   text-overflow: ellipsis;
+  159   max-height: 30%;
+  160 }
+  161
+  162 .book-glow {
+  163   position: absolute;
+  164   bottom: -14px;
+  165   left: 50%;
+  166   transform: translateX(-50%);
+  167   width: 160%;
+  168   height: 24px;
+  169   background: radial-gradient(ellipse at center, var(--accent) 0%, transparent 70%);
+  170   opacity: 0;
+  171   transition: opacity 0.3s ease;
+  172   filter: blur(5px);
+  173   pointer-events: none;
+  174   z-index: -1;
+  175 }
+  176
+  177 .book:hover {
+  178   transform: translateY(-16px) rotateX(-4deg) scale(1.02);
+  179   z-index: 20;
+  180   box-shadow: 0 24px 48px -8px rgba(0,0,60,0.45), 0 8px 16px -4px rgba(0,0,0,0.3);
+  181 }
+  182
+  183 .book:hover .book-glow { opacity: 0.6; }
+  184
+  185 .plank { width: 100%; min-width: 480px; }
+  186
+  187 .plank-edge {
+  188   height: 9px;
+  189   border-radius: 1px 1px 0 0;
+  190   background: linear-gradient(90deg,#4A2810 0%,#7A4820 10%,#9A5C28 22%,#7A4020 36%,#AA6030 50%,#6A3818 64%,#8C4E24 78%,#5A3010 90%,#4A2810 100%);
+  191   box-shadow: 0 -3px 10px rgba(0,0,0,0.3);
+  192 }
+  193
+  194 .plank-face {
+  195   height: 28px;
+  196   background: linear-gradient(180deg,#3C2010 0%,#261408 100%);
+  197   box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 3px 0 rgba(0,0,0,0.8);
+  198 }
+  199
+  200 .book-info {
+  201   margin-top: 36px;
+  202   min-height: 60px;
+  203   text-align: center;
+  204   opacity: 0;
+  205   transform: translateY(6px);
+  206   transition: opacity 0.2s ease, transform 0.2s ease;
+  207   pointer-events: none;
+  208 }
+  209
+  210 .book-info.visible { opacity: 1; transform: translateY(0); }
+  211
+  212 .info-title {
+  213   font-style: italic;
+  214   font-size: 20px;
+  215   font-weight: 400;
+  216   color: #fff;
+  217   max-width: 520px;
+  218   line-height: 1.4;
+  219   text-shadow: 0 1px 8px rgba(0,0,60,0.25);
+  220 }
+  221
+  222 .info-meta {
+  223   font-family: 'Courier Prime', monospace;
+  224   font-size: 11px;
+  225   letter-spacing: 0.12em;
+  226   color: rgba(255,255,255,0.55);
+  227   margin-top: 8px;
+  228   display: flex;
+  229   gap: 10px;
+  230   justify-content: center;
+  231 }
+  232 </style>
+  233 </head>
+  234 <body>
+  235
+  236 <canvas id="sky"></canvas>
+  237
+  238 <div class="scene">
+  239   <header>
+  240     <div class="eyebrow">to-read</div>
+  241     <h1>Shankar's <em>Bookshelf</em></h1>
+  242     <p class="subtitle">8 books waiting to be opened</p>
+  243   </header>
+  244
+  245   <div class="shelf-wrap">
+  246     <div class="books-row" id="books"></div>
+  247     <div class="plank">
+  248       <div class="plank-edge"></div>
+  249       <div class="plank-face"></div>
+  250     </div>
+  251   </div>
+  252
+  253   <div class="book-info" id="info">
+  254     <div class="info-title" id="info-title"></div>
+  255     <div class="info-meta" id="info-meta"></div>
+  256   </div>
+  257 </div>
+  258
+  259 <script>
+  260 const BOOKS = [
+  261   { title: "Think Straight", fullTitle: "Think Straight: Change Your Thoughts, Change Your Life", author: "Darius Foroux", pages: 78 },
+  262   { title: "Dopamine Detox", fullTitle: "Dopamine Detox: A Short Guide to Remove Distractions and Train Your Brain to Do Hard Things", author: "Thi
+      baut Meurisse", pages: 62 },
+  263   { title: "The Gentleman From Peru", fullTitle: "The Gentleman From Peru", author: "André Aciman", pages: 110 },
+  264   { title: "H.I.T. Investing", fullTitle: "H.I.T. Investing: Strong Returns Through High-Impact Investing Leveraging Technology", author: "Mahesh J
+      oshi", pages: 240 },
+  265   { title: "Thinking in Bets", fullTitle: "Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts", author: "Annie Duke", pag
+      es: 288 },
+  266   { title: "Runnin' Down a Dream", fullTitle: "Runnin' Down a Dream: How to Thrive in a Career You Actually Love", author: "Bill Gurley", pages: 27
+      2 },
+  267   { title: "Empire of AI", fullTitle: "Empire of AI: Dreams and Nightmares in Sam Altman's OpenAI", author: "Karen Hao", pages: 496 },
+  268   { title: "The Let Them Theory", fullTitle: "The Let Them Theory: A Life-Changing Tool That Millions of People Can't Stop Talking About", author: 
+      "Mel Robbins", pages: 311 },
+  269 ];
+  270
+  271 const PALETTE = [
+  272   { bg: '#C0392B', accent: '#E74C3C' },
+  273   { bg: '#2980B9', accent: '#5DADE2' },
+  274   { bg: '#27AE60', accent: '#58D68D' },
+  275   { bg: '#D35400', accent: '#E59866' },
+  276   { bg: '#8E44AD', accent: '#BB8FCE' },
+  277   { bg: '#16A085', accent: '#48C9B0' },
+  278   { bg: '#B7950B', accent: '#F4D03F' },
+  279   { bg: '#1A5276', accent: '#5499C7' },
+  280 ];
+  281
+  282 // ── Render books ─────────────────────────────────────────────────
+  283 const row = document.getElementById('books');
+  284 const info = document.getElementById('info');
+  285 const infoTitle = document.getElementById('info-title');
+  286 const infoMeta = document.getElementById('info-meta');
+  287
+  288 BOOKS.forEach((book, i) => {
+  289   const pal = PALETTE[i % PALETTE.length];
+  290   const el = document.createElement('div');
+  291   el.className = 'book';
+  292   el.style.setProperty('--bg', pal.bg);
+  293   el.style.setProperty('--accent', pal.accent);
+  294   el.innerHTML = `
+  295     <div class="book-body">
+  296       <div class="book-stripe"></div>
+  297       <span class="book-title">${book.title}</span>
+  298       <span class="book-author">${book.author}</span>
+  299     </div>
+  300     <div class="book-glow"></div>
+  301   `;
+  302   el.addEventListener('mouseenter', () => {
+  303     playNote(i);
+  304     infoTitle.textContent = book.fullTitle;
+  305     infoMeta.textContent = `${book.author}  ·  ${book.pages} pages`;
+  306     info.classList.add('visible');
+  307   });
+  308   el.addEventListener('mouseleave', () => info.classList.remove('visible'));
+  309   row.appendChild(el);
+  310 });
+  311
+  312 // ── Pixel sky ────────────────────────────────────────────────────
+  313 const canvas = document.getElementById('sky');
+  314 const ctx = canvas.getContext('2d');
+  315 const PX = 8;
+  316
+  317 const CLOUDS = [
+  318   { shape: ['000111000000','011111110000','111111111100','111111111111','111111111111','222222222222','022222222220'], x: 120, y: 55, speed: 0.28 }
+      ,
+  319   { shape: ['00011100','01111110','11111111','11111111','22222222','02222220'], x: 480, y: 90, speed: 0.18 },
+  320   { shape: ['0001110000','0111111000','1111111110','1111111111','2222222222'], x: 820, y: 70, speed: 0.22 },
+  321   { shape: ['001110','111111','111111','222222'], x: 280, y: 130, speed: 0.14 },
+  322   { shape: ['000011100000','001111111000','011111111110','111111111111','222222222222','022222222220'], x: 650, y: 40, speed: 0.32 },
+  323   { shape: ['011100','111110','111111','222222'], x: 1050, y: 110, speed: 0.16 },
+  324 ];
+  325
+  326 function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  327 resize();
+  328 window.addEventListener('resize', resize);
+  329
+  330 function drawCloud(c) {
+  331   for (let r = 0; r < c.shape.length; r++) {
+  332     for (let col = 0; col < c.shape[r].length; col++) {
+  333       const ch = c.shape[r][col];
+  334       if (ch === '0') continue;
+  335       ctx.fillStyle = ch === '1' ? 'rgba(255,255,255,0.92)' : 'rgba(180,210,240,0.55)';
+  336       ctx.fillRect(Math.round(c.x + col * PX), Math.round(c.y + r * PX), PX, PX);
+  337     }
+  338   }
+  339 }
+  340
+  341 (function tick() {
+  342   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  343   for (const c of CLOUDS) {
+  344     drawCloud(c);
+  345     c.x -= c.speed;
+  346     if (c.x + c.shape[0].length * PX < -PX) c.x = canvas.width + PX;
+  347   }
+  348   requestAnimationFrame(tick);
+  349 })();
+  350
+  351 // ── Piano ────────────────────────────────────────────────────────
+  352 let audioCtx;
+  353 const FREQS = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+  354
+  355 function playNote(i) {
+  356   try {
+  357     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  358     const ac = audioCtx, freq = FREQS[i % FREQS.length], now = ac.currentTime;
+  359     const o1 = ac.createOscillator(), o2 = ac.createOscillator();
+  360     const f = ac.createBiquadFilter(), g = ac.createGain();
+  361     o1.type = 'triangle'; o1.frequency.value = freq;
+  362     o2.type = 'sine'; o2.frequency.value = freq * 2.005;
+  363     f.type = 'lowpass'; f.frequency.value = 1200;
+  364     g.gain.setValueAtTime(0, now);
+  365     g.gain.linearRampToValueAtTime(0.12, now + 0.02);
+  366     g.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+  367     [o1, o2].forEach(o => { o.connect(f); o.start(now); o.stop(now + 2); });
+  368     f.connect(g); g.connect(ac.destination);
+  369   } catch(_) {}
+  370 }
+  371 </script>
+  372 </body>
+  373 </html>
