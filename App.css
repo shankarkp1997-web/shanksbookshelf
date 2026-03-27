@@ -1,0 +1,318 @@
+/* ── Root & Background ─────────────────────────────────────────── */
+
+:root {
+  --sky:       #386AF5;
+  --text-dark: #0D1B3E;
+  --text-mid:  #2C3E7A;
+  --text-dim:  rgba(30, 50, 120, 0.5);
+}
+
+.app {
+  min-height: 100vh;
+  background: var(--sky);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Pixel sky canvas ──────────────────────────────────────────── */
+
+.sky-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Scene wrapper ─────────────────────────────────────────────── */
+
+.scene {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 48px 72px;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+
+.shelf-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.shelf-eyebrow {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 16px;
+}
+
+.shelf-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(48px, 8vw, 88px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  text-shadow: 0 2px 24px rgba(0, 0, 40, 0.25);
+}
+
+.shelf-title em {
+  font-style: italic;
+  color: #FFE58A;
+}
+
+.shelf-subtitle {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 18px;
+}
+
+/* ── Shelf structure ───────────────────────────────────────────── */
+
+.shelf-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Books row */
+.books-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 0 6px;
+}
+
+/* ── Book Spine ────────────────────────────────────────────────── */
+
+.book-spine {
+  position: relative;
+  cursor: pointer;
+  width: 52px;
+  height: 340px;
+  transform-origin: bottom center;
+  transition:
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.28s ease;
+  flex-shrink: 0;
+  border-radius: 2px 2px 0 0;
+  overflow: visible;
+}
+
+/* Light top edge */
+.book-spine::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.28);
+  border-radius: 2px 2px 0 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Book body */
+.book-body {
+  width: 100%;
+  height: 100%;
+  background: var(--spine-bg);
+  border-radius: 2px 2px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 5px 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grain overlay */
+.book-body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Vertical accent stripe */
+.book-stripe {
+  position: absolute;
+  top: 16px;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--spine-accent) 40%, var(--spine-accent) 60%, transparent);
+  opacity: 0.25;
+}
+
+/* Title text */
+.book-title-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  color: var(--spine-fg);
+  line-height: 1.25;
+  text-align: center;
+  flex: 1;
+  overflow: hidden;
+  padding: 4px 0;
+}
+
+/* Author text */
+.book-author-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: 'Courier Prime', monospace;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 30%;
+}
+
+/* Hover lift */
+.book-spine.active {
+  transform: translateY(-16px) rotateX(-4deg) scale(1.02);
+  z-index: 20;
+  box-shadow:
+    0 24px 48px -8px rgba(0, 0, 60, 0.45),
+    0 8px 16px -4px rgba(0, 0, 0, 0.3);
+}
+
+/* Accent glow beneath lifted book */
+.book-glow {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160%;
+  height: 24px;
+  background: radial-gradient(ellipse at center, var(--spine-accent) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  filter: blur(5px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.book-spine.active .book-glow {
+  opacity: 0.6;
+}
+
+/* ── Wooden shelf plank ─────────────────────────────────────────── */
+
+.shelf-plank {
+  width: 100%;
+  min-width: 480px;
+}
+
+.plank-edge {
+  height: 9px;
+  border-radius: 1px 1px 0 0;
+  background: linear-gradient(
+    90deg,
+    #4A2810 0%,
+    #7A4820 10%,
+    #9A5C28 22%,
+    #7A4020 36%,
+    #AA6030 50%,
+    #6A3818 64%,
+    #8C4E24 78%,
+    #5A3010 90%,
+    #4A2810 100%
+  );
+  box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.plank-face {
+  height: 28px;
+  background: linear-gradient(180deg, #3C2010 0%, #261408 100%);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    0 3px 0 rgba(0, 0, 0, 0.8);
+}
+
+.plank-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 30px,
+    rgba(0,0,0,0.07) 30px,
+    rgba(0,0,0,0.07) 32px,
+    transparent 32px,
+    transparent 78px,
+    rgba(255,255,255,0.018) 78px,
+    rgba(255,255,255,0.018) 80px
+  );
+}
+
+/* ── Hover info ─────────────────────────────────────────────────── */
+
+.book-info {
+  margin-top: 36px;
+  min-height: 60px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.book-info.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.info-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 20px;
+  font-weight: 400;
+  color: #FFFFFF;
+  max-width: 520px;
+  line-height: 1.4;
+  text-shadow: 0 1px 8px rgba(0, 0, 60, 0.25);
+}
+
+.info-meta {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-sep {
+  opacity: 0.4;
+}
